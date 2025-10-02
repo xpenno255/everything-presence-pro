@@ -802,7 +802,7 @@ select:
       then:
         - lambda: |-
             id(extra_entities) = i;
-            
+
             if (i < 5) {  // If not using Speed and Resolution
               id(ld2450_target1_speed).publish_state(NAN);
               id(ld2450_target2_speed).publish_state(NAN);
@@ -811,62 +811,62 @@ select:
               id(ld2450_target2_resolution).publish_state(NAN);
               id(ld2450_target3_resolution).publish_state(NAN);
             }
-            
+
             if (i < 4) {  // If not using Distance and Angle
-              id(target1_distance).publish_state(NAN);
-              id(target2_distance).publish_state(NAN);
-              id(target3_distance).publish_state(NAN);
-              id(target1_angle).publish_state(NAN);
-              id(target2_angle).publish_state(NAN);
-              id(target3_angle).publish_state(NAN);
+              id(ld2450_target1_distance).publish_state(NAN);
+              id(ld2450_target2_distance).publish_state(NAN);
+              id(ld2450_target3_distance).publish_state(NAN);
+              id(ld2450_target1_angle).publish_state(NAN);
+              id(ld2450_target2_angle).publish_state(NAN);
+              id(ld2450_target3_angle).publish_state(NAN);
             }
-            
+
             if (i < 3) {  // If not using Targets active
-              id(target1_active).publish_state(false);
-              id(target2_active).publish_state(false);
-              id(target3_active).publish_state(false);
+              id(ld2450_target1_active).publish_state(false);
+              id(ld2450_target2_active).publish_state(false);
+              id(ld2450_target3_active).publish_state(false);
             }
-            
+
             if (i < 2) {  // If not using Zone count
-              id(zone1_target_count).publish_state(NAN);
-              id(zone2_target_count).publish_state(NAN);
-              id(zone3_target_count).publish_state(NAN);
-              id(zone4_target_count).publish_state(NAN);
-              id(occupancy_mask_1_target_count).publish_state(NAN);
-              id(occupancy_mask_2_target_count).publish_state(NAN);
+              id(ld2450_zone1_target_count).publish_state(NAN);
+              id(ld2450_zone2_target_count).publish_state(NAN);
+              id(ld2450_zone3_target_count).publish_state(NAN);
+              id(ld2450_zone4_target_count).publish_state(NAN);
+              id(ld2450_mask1_target_count).publish_state(NAN);
+              id(ld2450_mask2_target_count).publish_state(NAN);
             }
-            
+
             if (i < 1) {  // If using None
-              id(target1_x).publish_state(NAN);
-              id(target1_y).publish_state(NAN);
-              id(target2_x).publish_state(NAN);
-              id(target2_y).publish_state(NAN);
-              id(target3_x).publish_state(NAN);
-              id(target3_y).publish_state(NAN);
+              id(ld2450_target1_x).publish_state(NAN);
+              id(ld2450_target1_y).publish_state(NAN);
+              id(ld2450_target2_x).publish_state(NAN);
+              id(ld2450_target2_y).publish_state(NAN);
+              id(ld2450_target3_x).publish_state(NAN);
+              id(ld2450_target3_y).publish_state(NAN);
             }
 
 uart:
-  id: uart_bus
-  tx_pin:
-    number: GPIO13
-    mode:
-      input: true
-      pullup: true
-  rx_pin:
-    number: GPIO14
-    mode:
-      input: true
-      pullup: true
-  baud_rate: 256000
-  parity: NONE
-  stop_bits: 1
-  data_bits: 8
-  debug:
-    direction: BOTH
-    dummy_receiver: True
-    after:
-      delimiter: [0X55, 0XCC]
-    sequence:
+  - id: uart_bus
+    tx_pin:
+      number: GPIO13
+      mode:
+        input: true
+        pullup: true
+    rx_pin:
+      number: GPIO14
+      mode:
+        input: true
+        pullup: true
+    baud_rate: 256000
+    parity: NONE
+    stop_bits: 1
+    data_bits: 8
+    debug:
+      direction: BOTH
+      dummy_receiver: True
+      after:
+        delimiter: [0X55, 0XCC]
+      sequence:
       # - lambda: UARTDebug::log_hex(direction, bytes, ' ');
       - lambda: |-
           if ((millis() - id(mmwave_update_time)) <= id(mmwave_update_interval)) { 
