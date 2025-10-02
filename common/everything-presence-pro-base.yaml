@@ -110,9 +110,9 @@ ethernet:
   mdc_pin: GPIO23
   mdio_pin: GPIO18
   clk:
-    mode: GPIO17_OUT
+    pin: GPIO17
+    mode: CLK_OUT
   phy_addr: 0
-  use_address: "10.5.12.170"
 
 debug:
   update_interval: 5s
