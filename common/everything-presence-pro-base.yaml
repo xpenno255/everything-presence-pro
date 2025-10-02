@@ -1,11 +1,7 @@
-# Everything Presence Pro Base Package
-# Core functionality shared across all Pro variants
-# Includes: PIR, Environmental sensors, LED control, System features
-
 esphome:
   project:
     name: EverythingSmartTechnology.Everything Presence Pro
-    version: "1.1.0"
+    version: "1.1.1"
   on_boot:
     - priority: 500 
       then:
