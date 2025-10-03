@@ -398,6 +398,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 3 End X"
     id: ld2450_zone3_end_x
@@ -408,6 +409,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 3 Start Y"
     id: ld2450_zone3_begin_y
@@ -418,6 +420,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 3 End Y"
     id: ld2450_zone3_end_y
@@ -428,6 +431,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 3 Timeout"
     id: ld2450_zone3_off_delay
@@ -439,6 +443,7 @@ number:
     unit_of_measurement: "s"
     initial_value: 15
     disabled_by_default: true
+    entity_category: config
 
   - platform: template
     name: "Zone 4 Start X"
@@ -450,6 +455,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 4 End X"
     id: ld2450_zone4_end_x
@@ -460,6 +466,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 4 Start Y"
     id: ld2450_zone4_begin_y
@@ -470,6 +477,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 4 End Y"
     id: ld2450_zone4_end_y
@@ -480,6 +488,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Zone 4 Timeout"
     id: ld2450_zone4_off_delay
@@ -491,6 +500,7 @@ number:
     unit_of_measurement: "s"
     initial_value: 15
     disabled_by_default: true
+    entity_category: config
 
   - platform: template
     name: "Exclusion Zone 1 Start X"
@@ -501,6 +511,7 @@ number:
     step: 10
     optimistic: True
     restore_value: True
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 1 End X"
     id: ld2450_mask1_end_x
@@ -510,6 +521,7 @@ number:
     step: 10
     optimistic: True
     restore_value: True
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 1 Start Y"
     id: ld2450_mask1_begin_y
@@ -519,6 +531,7 @@ number:
     step: 10
     optimistic: True
     restore_value: True
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 1 End Y"
     id: ld2450_mask1_end_y
@@ -528,6 +541,7 @@ number:
     step: 10
     optimistic: True
     restore_value: True
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 2 Start X"
     id: ld2450_mask2_begin_x
@@ -538,6 +552,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 2 End X"
     id: ld2450_mask2_end_x
@@ -548,6 +563,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 2 Start Y"
     id: ld2450_mask2_begin_y
@@ -558,6 +574,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
   - platform: template
     name: "Exclusion Zone 2 End Y"
     id: ld2450_mask2_end_y
@@ -568,6 +585,7 @@ number:
     optimistic: True
     restore_value: True
     disabled_by_default: true
+    entity_category: config
 
   - platform: template
     name: "Stuck Target Timeout"
