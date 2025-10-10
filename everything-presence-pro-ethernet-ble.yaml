@@ -9,7 +9,7 @@ substitutions:
   # Firmware variant configuration
   firmware_network: "Ethernet"
   firmware_co2: "Disabled"
-  firmware_ble: "Disabled"
+  firmware_ble: "Enabled"
 
 esp32:
   board: esp32dev
@@ -21,6 +21,7 @@ packages:
    pro_base: !include common/everything-presence-pro-base.yaml
    ld2450_base: !include common/ld2450-base.yaml
    sen0609_base: !include common/sen0609-base.yaml
+   bluetooth_base: !include common/bluetooth-base.yaml
 
 esphome:
   name: ${name}
@@ -30,13 +31,4 @@ esphome:
 update:
   - platform: http_request
     name: Firmware Update
-    source: https://everythingsmarthome.github.io/everything-presence-pro/everything-presence-pro-ethernet-manifest.json
-
-# wifi:
-#   ssid: Everything Smart IoT
-#   ***REDACTED***
-
-#   # Enable fallback hotspot (captive portal) in case wifi connection fails
-#   ap:
-#     ssid: "Dual-Mmwave Fallback Hotspot"
-#     password: "mVZVN2Aoc9Vd"
+    source: https://everythingsmarthome.github.io/everything-presence-pro/everything-presence-pro-ethernet-ble-manifest.json

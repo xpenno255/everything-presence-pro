@@ -1,3 +1,9 @@
+substitutions:
+  # Firmware variant defaults - override in variant YAML files
+  firmware_network: "Ethernet"
+  firmware_co2: "Disabled"
+  firmware_ble: "Disabled"
+
 esphome:
   project:
     name: EverythingSmartTechnology.Everything Presence Pro
@@ -92,14 +98,10 @@ api:
 
 http_request:
 
-update:
-  - platform: http_request
-    name: Firmware Update
-    source: https://docs.everythingsmart.io/update/everything-presence-pro/manifest.json
-
 ota:
   - platform: esphome
   - platform: http_request
+    id: ota_http_request
 
 ethernet:
   type: LAN8720
@@ -407,6 +409,60 @@ select:
               - logger.log: "Setting LED to Presence mode"
               - light.turn_off: led_rgb
 
+  - platform: template
+    name: "Firmware Network Type"
+    id: firmware_network_type
+    entity_category: diagnostic
+    optimistic: true
+    options:
+      - "WiFi"
+      - "Ethernet"
+    initial_option: ${firmware_network}
+    restore_value: true
+    icon: mdi:network
+    on_value:
+      then:
+        - logger.log:
+            format: "Network type changed to: %s"
+            args: ['x.c_str()']
+        - script.execute: trigger_firmware_update
+
+  - platform: template
+    name: "Firmware CO2 Sensor"
+    id: firmware_co2_enabled
+    entity_category: diagnostic
+    optimistic: true
+    options:
+      - "Disabled"
+      - "Enabled"
+    initial_option: ${firmware_co2}
+    restore_value: true
+    icon: mdi:molecule-co2
+    on_value:
+      then:
+        - logger.log:
+            format: "CO2 sensor changed to: %s"
+            args: ['x.c_str()']
+        - script.execute: trigger_firmware_update
+
+  - platform: template
+    name: "Firmware Bluetooth Proxy"
+    id: firmware_ble_enabled
+    entity_category: diagnostic
+    optimistic: true
+    options:
+      - "Disabled"
+      - "Enabled"
+    initial_option: ${firmware_ble}
+    restore_value: true
+    icon: mdi:bluetooth
+    on_value:
+      then:
+        - logger.log:
+            format: "Bluetooth proxy changed to: %s"
+            args: ['x.c_str()']
+        - script.execute: trigger_firmware_update
+
 script:
   - id: update_led_state
     then:
@@ -443,6 +499,45 @@ script:
           blue: 0%
           white: 0%
           effect: none
+
+  # Firmware switching script - constructs URL and triggers OTA update
+  - id: trigger_firmware_update
+    then:
+      - lambda: |-
+          // Build firmware URL based on selected options
+          std::string base_url = "https://everythingsmarthome.github.io/everything-presence-pro/everything-presence-pro-";
+          std::string filename = "";
+
+          // Add network type (required)
+          std::string network = id(firmware_network_type).state;
+          std::transform(network.begin(), network.end(), network.begin(), ::tolower);
+          filename += network;
+
+          // Add features in alphabetical order
+          std::vector<std::string> features;
+
+          if (id(firmware_ble_enabled).state == "Enabled") {
+            features.push_back("ble");
+          }
+
+          if (id(firmware_co2_enabled).state == "Enabled") {
+            features.push_back("co2");
+          }
+
+          // Features are already in alphabetical order (ble, co2)
+          for (const auto& feature : features) {
+            filename += "-" + feature;
+          }
+
+          filename += ".bin";
+          std::string full_url = base_url + filename;
+
+          ESP_LOGI("firmware_update", "Downloading firmware: %s", full_url.c_str());
+
+          // Trigger OTA update
+          auto *ota = id(ota_http_request);
+          ota->set_url(full_url.c_str());
+          ota->perform();
 
 switch:
   - platform: gpio

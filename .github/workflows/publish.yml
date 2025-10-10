@@ -1,0 +1,101 @@
+name: Build and Publish ESPHome firmware
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.yaml'
+
+jobs:
+  # Ethernet variants
+  publish-epp-ethernet:
+    name: Publish Everything Presence Pro Ethernet
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-ethernet.yaml
+      name: Everything Presence Pro Ethernet
+      manifest_filename: everything-presence-pro-ethernet-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-ethernet
+
+  publish-epp-ethernet-ble:
+    name: Publish Everything Presence Pro Ethernet BLE
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-ethernet-ble.yaml
+      name: Everything Presence Pro Ethernet BLE
+      manifest_filename: everything-presence-pro-ethernet-ble-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-ethernet-ble
+
+  publish-epp-ethernet-co2:
+    name: Publish Everything Presence Pro Ethernet CO₂
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-ethernet-co2.yaml
+      name: Everything Presence Pro Ethernet CO₂
+      manifest_filename: everything-presence-pro-ethernet-co2-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-ethernet-co2
+
+  publish-epp-ethernet-ble-co2:
+    name: Publish Everything Presence Pro Ethernet BLE CO₂
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-ethernet-ble-co2.yaml
+      name: Everything Presence Pro Ethernet BLE CO₂
+      manifest_filename: everything-presence-pro-ethernet-ble-co2-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-ethernet-ble-co2
+
+  # WiFi variants
+  publish-epp-wifi:
+    name: Publish Everything Presence Pro WiFi
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-wifi.yaml
+      name: Everything Presence Pro WiFi
+      manifest_filename: everything-presence-pro-wifi-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-wifi
+
+  publish-epp-wifi-ble:
+    name: Publish Everything Presence Pro WiFi BLE
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-wifi-ble.yaml
+      name: Everything Presence Pro WiFi BLE
+      manifest_filename: everything-presence-pro-wifi-ble-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-wifi-ble
+
+  publish-epp-wifi-co2:
+    name: Publish Everything Presence Pro WiFi CO₂
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-wifi-co2.yaml
+      name: Everything Presence Pro WiFi CO₂
+      manifest_filename: everything-presence-pro-wifi-co2-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-wifi-co2
+
+  publish-epp-wifi-ble-co2:
+    name: Publish Everything Presence Pro WiFi BLE CO₂
+    uses: EverythingSmartHome/everything-presence-lite/.github/workflows/esphome-build.yml@main
+    with:
+      files: everything-presence-pro-wifi-ble-co2.yaml
+      name: Everything Presence Pro WiFi BLE CO₂
+      manifest_filename: everything-presence-pro-wifi-ble-co2-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: everything-presence-pro-wifi-ble-co2
