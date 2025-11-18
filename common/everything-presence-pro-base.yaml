@@ -7,45 +7,22 @@ esphome:
       then:
         - delay: 200ms
         - switch.turn_on: system_alarm_relay
-        # Initial startup sequence that showcases the LED capabilities
+        # Start loading animation and keep it until API connects
+        - lambda: 'id(api_connected_flag) = false;'
         - light.turn_on:
             id: led_rgb
-            brightness: 50%
+            brightness: 25%
             red: 100%
-            green: 0%
+            green: 80%
             blue: 0%
             white: 0%
-            transition_length: 200ms
-        - delay: 500ms
-        - light.turn_on:
-            brightness: 50%
-            id: led_rgb
-            red: 0%
-            green: 100%
-            blue: 0%
-            white: 0%
-            transition_length: 200ms
-        - delay: 500ms
-        - light.turn_on:
-            brightness: 50%
-            id: led_rgb
-            red: 0%
-            green: 0%
-            blue: 100%
-            white: 0%
-            transition_length: 200ms
-        - delay: 500ms
-        - light.turn_on:
-            brightness: 50%
-            id: led_rgb
-            red: 100%
-            green: 100%
-            blue: 100%
-            white: 0%
-            transition_length: 200ms
-        - delay: 500ms
-        - light.turn_off: led_rgb
-        - script.execute: update_led_state
+            effect: "Network Connecting"
+
+globals:
+  - id: api_connected_flag
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
 # Enable logging
 logger:
@@ -54,31 +31,55 @@ logger:
 api:
   on_client_connected:
     then:
-      - light.turn_on:
-          id: led_rgb
-          brightness: 60%
-          red: 0%
-          green: 100%
-          blue: 100%
-          white: 0%
-          flash_length: 1s
-      - delay: 1s
-      # Return to previous state based on LED mode
       - if:
           condition:
-            lambda: 'return id(led_mode_select).state == "Environmental";'
+            lambda: 'return id(led_mode_select).state != "Manual Control";'
           then:
-            - script.execute: update_environmental_led
-      - if:
-          condition:
-            lambda: 'return id(led_mode_select).state == "Manual Control";'
-          then:
+            - lambda: 'id(api_connected_flag) = true;'
+            # Multi-color celebration, then restore mode
             - light.turn_off: led_rgb
-      - if:
-          condition:
-            lambda: 'return id(led_mode_select).state == "Presence";'
-          then:
-            - light.turn_off: led_rgb
+            - delay: 50ms
+            - light.turn_on:
+                id: led_rgb
+                brightness: 70%
+                red: 0%
+                green: 100%
+                blue: 100%
+                white: 0%
+            - delay: 250ms
+            - light.turn_on:
+                id: led_rgb
+                brightness: 70%
+                red: 0%
+                green: 60%
+                blue: 100%
+                white: 0%
+            - delay: 250ms
+            - light.turn_on:
+                id: led_rgb
+                brightness: 70%
+                red: 60%
+                green: 0%
+                blue: 100%
+                white: 0%
+            - delay: 250ms
+            - light.turn_on:
+                id: led_rgb
+                brightness: 70%
+                red: 100%
+                green: 0%
+                blue: 80%
+                white: 0%
+            - delay: 250ms
+            - light.turn_on:
+                id: led_rgb
+                brightness: 65%
+                red: 100%
+                green: 100%
+                blue: 100%
+                white: 0%
+            - delay: 350ms
+            - script.execute: update_led_state
 
   on_client_disconnected:
     then:
@@ -86,6 +87,7 @@ api:
           condition:
             lambda: 'return id(led_mode_select).state != "Manual Control";'
           then:
+            - lambda: 'id(api_connected_flag) = false;'
             - light.turn_on:
                 id: led_rgb
                 effect: "API Disconnected"
@@ -193,6 +195,24 @@ binary_sensor:
                 id(system_alarm_relay).turn_off();
               }
             }
+        - if:
+            condition:
+              lambda: 'return id(led_mode_select).state == "Presence";'
+            then:
+              - if:
+                  condition:
+                    lambda: 'return id(occupancy).state;'
+                  then:
+                    - light.turn_on:
+                        id: led_rgb
+                        brightness: 50%
+                        red: 0%
+                        green: 100%
+                        blue: 100%
+                        white: 0%
+                        effect: "Presence Glow"
+                  else:
+                    - light.turn_off: led_rgb
 
   - platform: template
     name: mmWave Presence
@@ -223,101 +243,30 @@ light:
           transition_length: 2s
           update_interval: 2s
       - pulse:
-          name: "Fast Pulse"
-          transition_length: 1s
-          update_interval: 1s
-          min_brightness: 30%
+          name: "Presence Glow"
+          transition_length: 800ms
+          update_interval: 800ms
+          min_brightness: 10%
           max_brightness: 70%
       - pulse:
-          name: "Presence Flash"
-          transition_length: 200ms
-          update_interval: 200ms
-          min_brightness: 30%
-          max_brightness: 80%
-      # Add API connection status effect
+          name: "Network Connecting"
+          transition_length: 800ms
+          update_interval: 800ms
+          min_brightness: 35%
+          max_brightness: 75%
+      # API connection status effect
       - strobe:
           name: "API Disconnected"
           colors:
             - state: true
-              brightness: 30%
+              brightness: 15%
               red: 100%
               green: 0%
               blue: 100%
               white: 0%
-              duration: 500ms
+              duration: 400ms
             - state: false
-              duration: 2000ms
-      - strobe:
-          name: "Fast Strobe"
-          colors:
-            - state: true
-              brightness: 100%
-              red: 100%
-              green: 0%
-              blue: 0%
-              white: 0%
-              duration: 100ms
-            - state: false
-              duration: 100ms
-      - strobe:
-          name: "Security Strobe"
-          colors:
-            - state: true
-              brightness: 100%
-              red: 100%
-              green: 0%
-              blue: 0%
-              white: 0%
-              duration: 500ms
-            - state: false
-              duration: 500ms
-      - pulse:
-          name: "Breathing"
-          transition_length: 1.5s
-          update_interval: 1.5s
-      - pulse:
-          name: "Security Breathing"
-          transition_length: 3s
-          update_interval: 3s
-          min_brightness: 20%
-          max_brightness: 60%
-      # Presence effects
-      - strobe:
-          name: "PIR Presence"
-          colors:
-            - state: true
-              brightness: 60%
-              red: 0%
-              green: 100%
-              blue: 0%
-              white: 0%
-              duration: 1000ms
-            - state: false
-              duration: 500ms
-      - strobe:
-          name: "mmWave Presence"
-          colors:
-            - state: true
-              brightness: 60%
-              red: 0%
-              green: 100%
-              blue: 100%
-              white: 0%
-              duration: 1000ms
-            - state: false
-              duration: 500ms
-      - strobe:
-          name: "Both Presence"
-          colors:
-            - state: true
-              brightness: 70%
-              red: 100%
-              green: 100%
-              blue: 100%
-              white: 100%
-              duration: 1000ms
-            - state: false
-              duration: 500ms
+              duration: 3000ms
 
 select:
   - platform: template
@@ -381,6 +330,7 @@ select:
               lambda: 'return id(led_mode_select).state == "Manual Control";'
             then:
               - logger.log: "Setting LED to Manual Control mode"
+              - light.turn_off: led_rgb
         
         - if:
             condition:
@@ -440,6 +390,7 @@ script:
             lambda: 'return id(led_mode_select).state == "Manual Control";'
           then:
             - logger.log: "Setting LED to Manual Control mode"
+            - light.turn_off: led_rgb
       
       - if:
           condition:
@@ -459,12 +410,12 @@ script:
     then:
       - light.turn_on:
           id: led_rgb
-          brightness: 30%
+          brightness: 20%
           red: 0%
-          green: 100%
-          blue: 0%
+          green: 80%
+          blue: 20%
           white: 0%
-          effect: none
+          effect: "Environmental Pulse"
 
 switch:
   - platform: gpio
