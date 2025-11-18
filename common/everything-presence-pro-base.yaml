@@ -349,9 +349,7 @@ select:
     optimistic: true
     options:
       - "Manual Control"
-      - "Environmental"
       - "Presence"
-      - "Environmental + Presence"
     initial_option: "Manual Control"
     restore_value: true
     icon: mdi:led-variant
@@ -506,115 +504,20 @@ script:
             - delay: 500ms
             - light.turn_off: led_rgb
 
-  # Environmental + Presence combined mode
+  # Placeholder for Environmental + Presence combined mode
+  # Real implementation is in co2-base.yaml for CO2-enabled builds
   - id: control_leds_environmental_presence
     then:
-      - if:
-          condition:
-            lambda: 'return id(occupancy).state;'
-          then:
-            # Presence detected - check CO2 level
-            - if:
-                condition:
-                  # CO2 is good - just show presence
-                  lambda: 'return id(co2).state < 800;'
-                then:
-                  # Good CO2 - show steady presence glow (warm purple)
-                  - light.turn_on:
-                      id: led_rgb
-                      effect: none
-                  - delay: 50ms
-                  - light.turn_on:
-                      id: led_rgb
-                      brightness: !lambda 'return 0.55 * id(led_brightness_multiplier).state;'
-                      red: 80%
-                      green: 20%
-                      blue: 100%
-                      white: 0%
-                      transition_length: 600ms
-                  - delay: 650ms
-                  - light.turn_on:
-                      id: led_rgb
-                      effect: "Presence Glow"
-                else:
-                  # CO2 is elevated (warning or alert) - alternate between presence and environmental
-                  - script.execute: alternate_presence_environmental
-          else:
-            # No presence - show environmental status only
-            - script.execute: update_environmental_led
+      # Default: just show presence (no CO2 sensor)
+      - script.execute: control_leds_presence
 
-  # Alternating presence and environmental display for when both presence and elevated CO2
+  # Placeholder for alternating presence and environmental display
+  # Real implementation is in co2-base.yaml for CO2-enabled builds
   - id: alternate_presence_environmental
     mode: restart
     then:
-      # Show presence glow (warm purple) for 3 seconds
-      - light.turn_on:
-          id: led_rgb
-          effect: none
-      - delay: 50ms
-      - light.turn_on:
-          id: led_rgb
-          brightness: !lambda 'return 0.55 * id(led_brightness_multiplier).state;'
-          red: 80%
-          green: 20%
-          blue: 100%
-          white: 0%
-          transition_length: 600ms
-      - delay: 650ms
-      - light.turn_on:
-          id: led_rgb
-          effect: "Presence Glow"
-      - delay: 3000ms
-      # Transition to environmental status for 4 seconds
-      - if:
-          condition:
-            lambda: 'return id(co2).state >= 800 && id(co2).state < 1200;'
-          then:
-            # Warning level - amber
-            - light.turn_on:
-                id: led_rgb
-                effect: none
-            - delay: 50ms
-            - light.turn_on:
-                id: led_rgb
-                brightness: !lambda 'return 0.45 * id(led_brightness_multiplier).state;'
-                red: 100%
-                green: 65%
-                blue: 0%
-                white: 0%
-                transition_length: 600ms
-            - delay: 650ms
-            - light.turn_on:
-                id: led_rgb
-                effect: "Environmental Warning"
-      - if:
-          condition:
-            lambda: 'return id(co2).state >= 1200;'
-          then:
-            # Alert level - red
-            - light.turn_on:
-                id: led_rgb
-                effect: none
-            - delay: 50ms
-            - light.turn_on:
-                id: led_rgb
-                brightness: !lambda 'return 0.55 * id(led_brightness_multiplier).state;'
-                red: 100%
-                green: 0%
-                blue: 0%
-                white: 0%
-                transition_length: 600ms
-            - delay: 650ms
-            - light.turn_on:
-                id: led_rgb
-                effect: "Environmental Alert"
-      - delay: 4000ms
-      # Loop back by calling control_leds if still in this mode
-      - if:
-          condition:
-            lambda: 'return id(led_mode_select).state == "Environmental + Presence" && id(occupancy).state && id(co2).state >= 800;'
-          then:
-            - script.execute: alternate_presence_environmental
+      # Default: just show presence (no CO2 sensor)
+      - script.execute: control_leds_presence
 
   # DEPRECATED - kept for backwards compatibility with CO2
   # Smooth transition helper - fades out before changing state
@@ -743,66 +646,21 @@ script:
                 else:
                   - script.execute: led_fade_out
 
+  # Placeholder script for environmental LED updates
+  # Real implementation is in co2-base.yaml for CO2-enabled builds
   - id: update_environmental_led
     then:
-      # Check if CO2 sensor exists and use its data, otherwise default to good
-      - if:
-          condition:
-            lambda: 'return id(co2).state >= 1200;'
-          then:
-            # High CO2 - red with alert effect
-            - light.turn_on:
-                id: led_rgb
-                effect: none
-            - delay: 50ms
-            - light.turn_on:
-                id: led_rgb
-                brightness: !lambda 'return 0.55 * id(led_brightness_multiplier).state;'
-                red: 100%
-                green: 0%
-                blue: 0%
-                white: 0%
-                transition_length: 600ms
-            - delay: 650ms
-            - light.turn_on:
-                id: led_rgb
-                effect: "Environmental Alert"
-          else:
-            - if:
-                condition:
-                  lambda: 'return id(co2).state >= 800;'
-                then:
-                  # Medium CO2 - amber with warning effect
-                  - light.turn_on:
-                      id: led_rgb
-                      effect: none
-                  - delay: 50ms
-                  - light.turn_on:
-                      id: led_rgb
-                      brightness: !lambda 'return 0.45 * id(led_brightness_multiplier).state;'
-                      red: 100%
-                      green: 65%
-                      blue: 0%
-                      white: 0%
-                      transition_length: 600ms
-                  - delay: 650ms
-                  - light.turn_on:
-                      id: led_rgb
-                      effect: "Environmental Warning"
-                else:
-                  # Good CO2 - steady green (no effect)
-                  - light.turn_on:
-                      id: led_rgb
-                      effect: none
-                  - delay: 50ms
-                  - light.turn_on:
-                      id: led_rgb
-                      brightness: !lambda 'return 0.35 * id(led_brightness_multiplier).state;'
-                      red: 0%
-                      green: 100%
-                      blue: 0%
-                      white: 0%
-                      transition_length: 600ms
+      # Default: turn off LED (no CO2 sensor available)
+      - light.turn_on:
+          id: led_rgb
+          effect: none
+      - delay: 50ms
+      - light.turn_on:
+          id: led_rgb
+          brightness: 1%
+          transition_length: 500ms
+      - delay: 500ms
+      - light.turn_off: led_rgb
 
 switch:
   - platform: gpio
