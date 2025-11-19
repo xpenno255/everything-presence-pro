@@ -95,7 +95,6 @@ api:
 
 http_request:
   verify_ssl: false
-  timeout: 30s
 
 ota:
   - platform: esphome
@@ -358,7 +357,7 @@ select:
     on_value:
       then:
         - script.execute: control_leds
-        
+
   - platform: template
     id: firmware_network
     name: Network Type
@@ -396,8 +395,6 @@ select:
     initial_option: "Disabled"
 
 script:
-  # Master LED control script - single source of truth for LED state
-  # Called whenever device state changes (like HA Voice approach)
   - id: control_leds
     mode: restart
     then:
@@ -807,6 +804,33 @@ button:
           ESP_LOGI("firmware", "Switching to manifest: %s", base_url.c_str());
           id(update_http_request).set_source_url(base_url.c_str());
       - component.update: update_http_request
+      - delay: 2s
+      - update.perform:
+          id: update_http_request
+          force_update: true
+      - logger.log: "Applying firmware update based on selected configuration - using http fallback"
+      - lambda: |-
+          // Build manifest URL based on selected options
+          std::string base_url = "http://docs.everythingsmart.io/update/everything-presence-pro/everything-presence-pro-";
+
+          // Add network type (required, lowercase)
+          std::string network = id(firmware_network).state;
+          std::transform(network.begin(), network.end(), network.begin(), ::tolower);
+          base_url += network;
+
+          // Add features in alphabetical order (ble before co2)
+          if (id(firmware_ble).state == "Enabled") {
+            base_url += "-ble";
+          }
+
+          if (id(firmware_co2).state == "Enabled") {
+            base_url += "-co2";
+          }
+
+          base_url += "-manifest.json";
+
+          ESP_LOGI("firmware", "Switching to manifest: %s", base_url.c_str());
+          id(update_http_request).set_source_url(base_url.c_str());
       - delay: 2s
       - update.perform:
           id: update_http_request
