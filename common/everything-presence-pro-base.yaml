@@ -349,14 +349,16 @@ select:
     optimistic: true
     options:
       - "Manual Control"
+      - "Environmental"
       - "Presence"
+      - "Environmental + Presence"
     initial_option: "Manual Control"
     restore_value: true
     icon: mdi:led-variant
     on_value:
       then:
         - script.execute: control_leds
-
+        
   - platform: template
     id: firmware_network
     name: Network Type
