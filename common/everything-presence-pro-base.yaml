@@ -6,25 +6,7 @@ esphome:
     - priority: 375
       then:
         - delay: 200ms
-        - lambda: |-
-            auto mode = id(system_alarm_mode).state;
-            bool activate = false;
-
-            if (mode == "Motion Only") {
-              activate = id(pir_motion).state;
-            } else if (mode == "Presence Only") {
-              activate = id(occupancy).state;
-            } else if (mode == "Motion or Presence") {
-              activate = id(pir_motion).state || id(occupancy).state;
-            }
-
-            bool desired = (id(relay_contact_mode).state == "Normally Open (NO)") ? activate : !activate;
-
-            if (desired) {
-              id(system_alarm_relay).turn_on();
-            } else {
-              id(system_alarm_relay).turn_off();
-            }
+        - script.execute: update_relay_state
         # Start loading animation and keep it until API connects
         - lambda: 'id(api_connected_flag) = false;'
         - light.turn_on:
@@ -318,6 +300,9 @@ select:
       - "Normally Closed (NC)"
     initial_option: "Normally Open (NO)"
     restore_value: true
+    on_value:
+      then:
+        - script.execute: update_relay_state
 
   - platform: template
     name: Relay Trigger Mode
@@ -333,25 +318,7 @@ select:
     restore_value: true
     on_value:
       then:
-        - lambda: |-
-            auto mode = id(system_alarm_mode).state;
-            bool activate = false;
-
-            if (mode == "Motion Only") {
-              activate = id(pir_motion).state;
-            } else if (mode == "Presence Only") {
-              activate = id(occupancy).state;
-            } else if (mode == "Motion or Presence") {
-              activate = id(pir_motion).state || id(occupancy).state;
-            }
-
-            bool desired = (id(relay_contact_mode).state == "Normally Open (NO)") ? activate : !activate;
-
-            if (desired) {
-              id(system_alarm_relay).turn_on();
-            } else {
-              id(system_alarm_relay).turn_off();
-            }
+        - script.execute: update_relay_state
 
   - platform: template
     name: "LED Mode"
@@ -407,6 +374,29 @@ select:
     initial_option: "Disabled"
 
 script:
+  - id: update_relay_state
+    mode: restart
+    then:
+      - lambda: |-
+          auto mode = id(system_alarm_mode).state;
+          bool activate = false;
+
+          if (mode == "Motion Only") {
+            activate = id(pir_motion).state;
+          } else if (mode == "Presence Only") {
+            activate = id(occupancy).state;
+          } else if (mode == "Motion or Presence") {
+            activate = id(pir_motion).state || id(occupancy).state;
+          }
+
+          bool desired = (id(relay_contact_mode).state == "Normally Open (NO)") ? activate : !activate;
+
+          if (desired) {
+            id(system_alarm_relay).turn_on();
+          } else {
+            id(system_alarm_relay).turn_off();
+          }
+ 
   - id: control_leds
     mode: restart
     then:
