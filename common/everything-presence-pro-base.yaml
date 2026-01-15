@@ -7,7 +7,20 @@ esphome:
       then:
         - delay: 200ms
         - lambda: |-
-            if (id(relay_contact_mode).state == "Normally Open (NO)") {
+            auto mode = id(system_alarm_mode).state;
+            bool activate = false;
+
+            if (mode == "Motion Only") {
+              activate = id(pir_motion).state;
+            } else if (mode == "Presence Only") {
+              activate = id(occupancy).state;
+            } else if (mode == "Motion or Presence") {
+              activate = id(pir_motion).state || id(occupancy).state;
+            }
+
+            bool desired = (id(relay_contact_mode).state == "Normally Open (NO)") ? activate : !activate;
+
+            if (desired) {
               id(system_alarm_relay).turn_on();
             } else {
               id(system_alarm_relay).turn_off();
