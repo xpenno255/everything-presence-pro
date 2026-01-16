@@ -178,7 +178,7 @@ binary_sensor:
         - lambda: |-
             auto mode = id(system_alarm_mode).state;
             if (mode == "Presence Only" || mode == "Motion or Presence") {
-              bool activate = id(pir_motion).state;
+              bool activate = id(occupancy).state;
               bool desired = (id(relay_contact_mode).state == "Normally Open (NO)") ? activate : !activate;
               if (desired) {
                 id(system_alarm_relay).turn_on();
