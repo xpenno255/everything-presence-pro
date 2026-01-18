@@ -29,6 +29,31 @@ logger:
 # Enable Home Assistant API
 api:
   id: api_id
+  actions:
+    - action: set_update_manifest
+      variables:
+        url: string
+      then:
+        - lambda: |-
+            ESP_LOGI("fw", "Setting update manifest URL: %s", url.c_str());
+            id(update_http_request).set_source_url(url);
+        - component.update: update_http_request
+        - delay: 1s
+        - update.perform:
+            id: update_http_request
+            force_update: true
+    - action: get_build_flags
+      then:
+        - api.respond:
+            data: !lambda |-
+              root["ethernet_enabled"]  = ${ device_config.ethernet_enabled | lower };
+              root["co2_enabled"]       = ${ device_config.co2_enabled | lower };
+              root["bluetooth_enabled"] = ${ device_config.bluetooth_enabled | lower };
+              root["board_revision"]    = "${ device_config.board_revision }";
+              root["sensor_variant"]    = "${ device_config.sensor_variant }";
+              root["firmware_channel"]  = "${ device_config.firmware_channel }";
+              root["model"]             = "${ device_config.model }";
+
   on_client_connected:
     then:
       - lambda: |

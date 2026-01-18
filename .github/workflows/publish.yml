@@ -111,3 +111,46 @@ jobs:
       clean: false
       esphome_version: latest
       directory_name: everything-presence-pro-wifi-ble-co2
+
+  # Generate firmware index after all builds complete
+  generate-firmware-index:
+    name: Generate Firmware Index
+    runs-on: ubuntu-latest
+    needs:
+      - publish-epp-ethernet
+      - publish-epp-ethernet-ble
+      - publish-epp-ethernet-co2
+      - publish-epp-ethernet-ble-co2
+      - publish-epp-wifi
+      - publish-epp-wifi-ble
+      - publish-epp-wifi-co2
+      - publish-epp-wifi-ble-co2
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get version from esphome project
+        id: version
+        run: |
+          VERSION=$(grep -m1 'version:' common/everything-presence-pro-base.yaml | sed 's/.*version: *//' | tr -d '"' | tr -d "'")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION"
+
+      - name: Generate firmware index
+        run: |
+          node scripts/generate-firmware-index.js --version "${{ steps.version.outputs.version }}"
+
+      - name: Deploy firmware index to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .
+          target-folder: /
+          clean: false
+          single-commit: false
+          commit-message: "Update firmware-index.json for v${{ steps.version.outputs.version }}"
