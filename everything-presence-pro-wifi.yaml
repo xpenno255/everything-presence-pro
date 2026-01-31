@@ -47,7 +47,7 @@ update:
   - platform: http_request
     id: update_http_request
     name: Firmware Update
-    source: http://docs.everythingsmart.io/update/everything-presence-pro/everything-presence-pro-wifi-manifest.json
+    source: https://everythingsmarthome.github.io/everything-presence-pro/everything-presence-pro-wifi-manifest.json
 
 wifi:
   on_connect:
